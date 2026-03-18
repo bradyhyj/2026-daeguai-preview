@@ -71,11 +71,11 @@ function Chat() {
   return (
     <div style={{ backgroundColor: '#f5f6fb', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <style>{`
-        .topBar { background: #3f4d8e; color: white; padding: 50px 16px 20px; border-bottom-left-radius: 24px; border-bottom-right-radius: 24px; flex-shrink: 0; }
+        .topBar { background: #3f4d8e; color: white; padding: 50px 16px 20px; border-bottom-left-radius: 0px; border-bottom-right-radius: 0px; flex-shrink: 0; }
         .headerRow { display: flex; align-items: center; gap: 12px; }
         .iconBtn { width: 32px; height: 32px; border: none; border-radius: 10px; background: rgba(255, 255, 255, 0.15); color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         .title { font-size: 18px; font-weight: 800; margin: 0; }
-        .chatArea { flex: 1; padding: 20px 16px 160px; overflow-y: auto; scroll-behavior: smooth; }
+        .chatArea { flex: 1; padding: 20px 16px 200px; overflow-y: auto; scroll-behavior: smooth; }
         .banner { width: 100%; border-radius: 12px; border: 1px solid #bfd0f7; background: #eaf1ff; color: #5a61b5; font-size: 12px; padding: 12px; margin-bottom: 24px; display: flex; align-items: center; gap: 8px; }
         .bubbleWrap { display: flex; align-items: flex-end; gap: 8px; margin-bottom: 20px; position: relative; }
         .bubble { border-radius: 18px; padding: 12px 16px; font-size: 14px; line-height: 1.6; max-width: 75%; position: relative; }
@@ -86,7 +86,7 @@ function Chat() {
           position: absolute; right: 8px; top: 8px; background: none; border: none; cursor: pointer; padding: 4px; display: flex; align-items: center; justify-content: center; 
         }
         
-        .bottomInputWrap { position: fixed; left: 0; right: 0; bottom: 90px; background: white; padding: 12px 16px; border-top: 1px solid #eee; z-index: 1000; }
+        .bottomInputWrap { position: fixed; left: 0; right: 0; bottom: 120px; background: white; padding: 12px 16px; border-top: 1px solid #eee; z-index: 1000; }
         .inputRow { display: flex; align-items: center; gap: 10px; }
         .chatInput { flex: 1; height: 44px; border-radius: 22px; border: 1px solid #d5d9e5; background: #f8f9ff; outline: none; padding: 0 18px; font-size: 14px; }
         .sendBtn { width: 40px; height: 40px; border: none; border-radius: 50%; background: #3f4d8e; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; }
