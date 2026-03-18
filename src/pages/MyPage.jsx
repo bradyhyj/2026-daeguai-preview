@@ -1,101 +1,176 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { ChevronRight, FileText, Bell, Headphones, Home, Mail, Phone, Calendar, User, LogOut } from "lucide-react";
 
 function MyPage() {
   const navigate = useNavigate();
+  const MAIN_COLOR = "#3f4d8e";
 
   const menuItems = [
-    { icon: "📄", title: "내 서류 분석 기록", desc: "분석한 계약서와 위험도 결과 확인" },
-    { icon: "✍️", title: "내 특약 관리", desc: "저장한 특약 문구 모아보기" },
-    { icon: "🔔", title: "알림 설정", desc: "중요 일정과 분석 알림 설정" },
-    { icon: "☎️", title: "고객센터", desc: "문의하기 및 도움말 확인" },
-  ];
-
-  const historyItems = [
-    { title: "마포구 합정동 123-4 / 302호", status: "주의", date: "2026.03.14", level: "warning" },
-    { title: "대구 북구 대학로 80 / 원룸", status: "안전", date: "2026.02.25", level: "safe" },
+    { icon: <FileText size={20} color={MAIN_COLOR} />, title: "내 서류 분석 기록", desc: "분석한 계약서와 결과 확인", path: "/history" },
+    { icon: <Bell size={20} color={MAIN_COLOR} />, title: "알림 설정", desc: "중요 일정 및 분석 알림", path: "/settings" },
+    { icon: <Headphones size={20} color={MAIN_COLOR} />, title: "고객센터", desc: "문의하기 및 도움말", path: "/support" },
   ];
 
   return (
-    <div style={{ backgroundColor: '#f3f4f8', minHeight: '100vh', paddingBottom: '100px' }}>
+    <div style={{ backgroundColor: '#F8F9FB', minHeight: '100vh', paddingBottom: '60px' }}>
       <style>{`
-        .topbar { height: 78px; background: #3f4d8e; color: white; display: flex; align-items: center; justify-content: space-between; padding: 40px 16px 12px; }
-        .mypage-container { padding: 18px 16px; }
-        .profile-card { background: linear-gradient(135deg, #4c40d4, #3f4d8e); border-radius: 22px; padding: 18px; color: white; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 20px rgba(63, 77, 142, 0.2); }
-        .avatar { width: 58px; height: 58px; border-radius: 18px; background: rgba(255, 255, 255, 0.2); display: flex; align-items: center; justify-content: center; font-size: 28px; }
-        .summary-section { margin-top: 16px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-        .summary-card { background: white; border-radius: 20px; padding: 14px 10px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 4px 14px rgba(0,0,0,0.05); }
-        .summary-label { font-size: 11px; color: #8a90a3; margin-bottom: 4px; }
-        .menu-item { width: 100%; border: none; background: white; border-radius: 22px; padding: 16px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 14px rgba(0,0,0,0.05); margin-bottom: 12px; cursor: pointer; }
-        .history-card { background: white; border-radius: 18px; padding: 14px; margin-bottom: 10px; border-left: 5px solid #ccc; box-shadow: 0 4px 14px rgba(0,0,0,0.05); }
-        .history-card.safe { border-left-color: #22c55e; }
-        .history-card.warning { border-left-color: #f59e0b; }
-        .history-status { font-size: 11px; font-weight: 700; padding: 4px 8px; border-radius: 10px; }
-        .history-status.safe { background: #dcfce7; color: #15803d; }
-        .history-status.warning { background: #fef3c7; color: #b45309; }
+        .header-profile-wrap { 
+          background: ${MAIN_COLOR}; 
+          color: white; 
+          padding-bottom: 40px; 
+          box-shadow: 0 10px 30px rgba(63, 77, 142, 0.15); 
+          margin-bottom: -35px; 
+          position: relative; 
+          z-index: 10; 
+          border-bottom-left-radius: 15px;
+          border-bottom-right-radius: 15px;
+        }
+
+        .topbar { 
+          display: flex; 
+          align-items: center; 
+          justify-content: flex-end; 
+          padding: 85px 24px 0; 
+          position: absolute; 
+          right: 0;
+          top: 0;
+          z-index: 100;
+        }
+        .home-btn { background: none; border: none; cursor: pointer; color: white; opacity: 0.9; }
+
+        .profile-section { 
+          padding: 75px 24px 10px; 
+          display: flex; 
+          align-items: center; 
+          gap: 20px; 
+          justify-content: flex-start; 
+        }
+        
+        .avatar-box { 
+          width: 100px; height:100px; border-radius: 32px; 
+          background: rgba(255, 255, 255, 0.12); 
+          display: flex; align-items: center; justify-content: center; 
+          border: 1px solid rgba(255, 255, 255, 0.2); flex-shrink: 0; 
+          box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+
+        .user-info { display: flex; flex-direction: column; gap: 3px; flex: 1; align-items: flex-start; }
+        .user-name { font-size: 26px; font-weight: 800; color: white; margin: 0 0 4px 0; letter-spacing: -0.5px; }
+        
+        .detail-row { display: flex; align-items: center; gap: 8px; font-size: 13px; color: rgba(255, 255, 255, 0.8); margin-bottom: 2px; }
+
+        .stat-container { display: flex; width: calc(100% - 40px); background: white; border-radius: 26px; padding: 20px; margin: 0 20px 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); box-sizing: border-box; position: relative; z-index: 20; }
+        .stat-item { flex: 1; display: flex; flex-direction: column; gap: 4px; align-items: center; }
+        .stat-label { font-size: 11.5px; color: #94a3b8; font-weight: 500; }
+        .stat-value { font-size: 18px; font-weight: 800; color: ${MAIN_COLOR}; } 
+        .stat-divider { width: 1px; background: #f1f5f9; margin: 0 5px; }
+
+        .menu-card { background: white; border-radius: 26px; margin: 0 20px; overflow: hidden; box-shadow: 0 8px 20px rgba(0,0,0,0.03); }
+        .menu-item { width: 100%; border: none; background: none; padding: 19px 22px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; border-bottom: 1px solid #f8fafc; transition: background 0.2s; box-sizing: border-box; }
+        .menu-item:last-child { border-bottom: none; }
+
+        /* ✅ 와이드 로그아웃 버튼 스타일 */
+        .logout-btn-wide {
+          width: calc(100% - 40px);
+          margin: 30px 20px 10px;
+          height: 56px;
+          border-radius: 18px;
+          border: none;
+          background: #f1f3f7;
+          color: #94a3b8;
+          font-size: 15px;
+          font-weight: 700;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+        .logout-btn-wide:active {
+          background: #e6e9ef;
+          transform: scale(0.98);
+        }
+
+        .version-info {
+          text-align: center;
+          font-size: 11px;
+          color: #cbd5e1;
+          margin-top: 10px;
+        }
       `}</style>
 
-      <header className="topbar">
-        <div style={{ fontSize: '20px', fontWeight: '800' }}>마이페이지</div>
-        <button onClick={() => navigate('/')} style={{ background: 'none', border: 'none', color: 'white', fontSize: '20px', cursor: 'pointer' }}>🏠</button>
-      </header>
+      <div className="header-profile-wrap">
+        <header className="topbar">
+          <button onClick={() => navigate('/')} className="home-btn">
+            <Home size={24} strokeWidth={2.3} />
+          </button>
+        </header>
 
-      <main className="mypage-container">
-        <section className="profile-card">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-            <div className="avatar">👤</div>
-            <div>
-              <p style={{ fontSize: '12px', opacity: 0.8 }}>경북대학교 컴퓨터학부</p>
-              <h2 style={{ fontSize: '20px', fontWeight: '700' }}>김고은 님</h2>
-              <p style={{ fontSize: '12px', opacity: 0.9 }}>2025005271</p>
+        <section className="profile-section">
+          <div className="avatar-box">
+            <User size={60} color="rgba(255, 255, 255, 0.6)" strokeWidth={1.5} />
+          </div>
+
+          <div className="user-info">
+            <h2 className="user-name">김고은</h2>
+            
+            <div style={{ marginTop: '4px' }}>
+              <div className="detail-row">
+                <Mail size={12} color="rgba(255, 255, 255, 0.6)" />
+                <span>rlarhdms1128@knu.ac.kr</span>
+              </div>
+              <div className="detail-row">
+                <Phone size={12} color="rgba(255, 255, 255, 0.6)" />
+                <span>010-8663-4254</span>
+              </div>
+              <div className="detail-row" style={{ marginTop: '6px', opacity: 0.7 }}>
+                <Calendar size={12} />
+                <span>2026.03.14 가입</span>
+              </div>
             </div>
           </div>
-          <button style={{ border: 'none', background: 'white', color: '#3f4d8e', padding: '8px 14px', borderRadius: '12px', fontWeight: '700', fontSize: '13px' }}>수정</button>
         </section>
+      </div>
 
-        <section className="summary-section">
-          <div className="summary-card">
-            <p className="summary-label">서류 분석</p>
-            <h3 style={{ margin: 0 }}>12건</h3>
+      <main>
+        <div className="stat-container">
+          <div className="stat-item">
+            <span className="stat-label">서류 분석 건수</span>
+            <span className="stat-value">12건</span>
           </div>
-          <div className="summary-card">
-            <p className="summary-label">상담 기록</p>
-            <h3 style={{ margin: 0 }}>8건</h3>
+          <div className="stat-divider"></div>
+          <div className="stat-item">
+            <span className="stat-label">상담 기록 내역</span>
+            <span className="stat-value">8건</span>
           </div>
-          <div className="summary-card" onClick={() => navigate('/calendar')} style={{ cursor: 'pointer' }}>
-            <p className="summary-label">중요 일정</p>
-            <h3 style={{ margin: 0 }}>3건</h3>
-          </div>
-        </section>
+        </div>
 
-        <h3 style={{ margin: '24px 0 12px', fontSize: '16px', fontWeight: '800' }}>메뉴</h3>
-        <section className="menu-section">
+        <section className="menu-card">
           {menuItems.map((item, index) => (
-            <button className="menu-item" key={index}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                <span style={{ fontSize: '22px' }}>{item.icon}</span>
+            <button className="menu-item" key={index} onClick={() => navigate(item.path)}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '17px' }}>
+                <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: '#f0f2f9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  {item.icon}
+                </div>
                 <div style={{ textAlign: 'left' }}>
-                  <p style={{ fontSize: '14px', fontWeight: '700', margin: 0 }}>{item.title}</p>
-                  <p style={{ fontSize: '11px', color: '#9197aa', margin: 0 }}>{item.desc}</p>
+                  <p style={{ fontSize: '15px', fontWeight: '700', color: '#1e293b', margin: 0 }}>{item.title}</p>
+                  <p style={{ fontSize: '12px', color: '#94a3b8', margin: '2px 0 0 0' }}>{item.desc}</p>
                 </div>
               </div>
-              <span style={{ color: '#b5bbcb' }}>›</span>
+              <ChevronRight size={18} color="#cbd5e1" />
             </button>
           ))}
         </section>
 
-        <h3 style={{ margin: '24px 0 12px', fontSize: '16px', fontWeight: '800' }}>최근 분석 기록</h3>
-        <section className="history-section">
-          {historyItems.map((item, index) => (
-            <div className={`history-card ${item.level}`} key={index}>
-              <p style={{ fontSize: '11px', color: '#9399aa', marginBottom: '4px' }}>{item.date}</p>
-              <p style={{ fontSize: '14px', fontWeight: '700', marginBottom: '8px' }}>{item.title}</p>
-              <span className={`history-status ${item.level}`}>{item.status}</span>
-            </div>
-          ))}
-        </section>
+        {/* ✅ 길게 바뀐 로그아웃 버튼 */}
+      <button className="logout-btn-wide" onClick={() => {}}>
+          <LogOut size={18} />
+          로그아웃
+        </button>
 
-        <button style={{ width: '100%', marginTop: '20px', height: '50px', border: 'none', borderRadius: '16px', background: '#eceef5', color: '#6b7280', fontWeight: '700', cursor: 'pointer' }}>로그아웃</button>
+        <p className="version-info">Version 1.0.2 (Build 20260319)</p>
       </main>
     </div>
   );
