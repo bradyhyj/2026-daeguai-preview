@@ -1,143 +1,288 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { AlertCircle, CheckCircle2, X } from 'lucide-react'; // 아이콘 라이브러리 활용 ㅋ
 
-function ContractReport() {
+const Icons = {
+  Back: () => (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+      <path d="M19 12H5M12 19l-7-7 7-7"/>
+    </svg>
+  ),
+  CheckCircle: () => (
+    <svg width="60" height="60" viewBox="0 0 48 48" fill="none">
+      <circle cx="24" cy="24" r="24" fill="#22C55E"/>
+      <path d="M14 24L21 31L34 18" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  ),
+};
+
+export default function Search() {
+  const [step, setStep] = useState('upload'); 
+  const [progress, setProgress] = useState(0); 
+  const [loopCount, setLoopCount] = useState(0); 
+  const [isModalOpen, setIsModalOpen] = useState(false); // 모달 오픈 상태 ㅋ
+  const [isAgreed, setIsAgreed] = useState(false); // 체크박스 상태 ㅋ
   const navigate = useNavigate();
-  
-  // ✅ 1. 시연을 위해 상태를 무조건 빈 객체({})로 시작합니다.
-  const [bookmarkedIds, setBookmarkedIds] = useState({});
+  const MAIN_COLOR = '#3f4d8e';
+  const SUCCESS_COLOR = '#22C55E';
 
-  // ✅ 2. 기존 데이터를 불러오는 로직을 시연용으로 비워두었습니다.
-  // 이 페이지를 열 때는 항상 '북마크 안 된 상태'로 보이게 됩니다.
+  const [uploadedFiles, setUploadedFiles] = useState({
+    doc1: null, doc2: null, doc3: null, doc4: null
+  });
+
   useEffect(() => {
-    // 시연 중 새로고침해도 깨끗한 상태를 유지하고 싶다면 이 안을 비워두면 됩니다.
-    setBookmarkedIds({}); 
-  }, []);
-
-  const toggleBookmark = (title, desc) => {
-    const currentList = JSON.parse(localStorage.getItem('bookmarked_terms') || '[]');
-    let newList;
-
-    if (bookmarkedIds[title]) {
-      // 해제 로직
-      newList = currentList.filter(item => item.title !== title);
-      alert('특약 북마크가 해제되었습니다.');
-    } else {
-      // 저장 로직
-      const newTerm = {
-        id: Date.now(),
-        title: title,
-        desc: desc
-      };
-      newList = [...currentList, newTerm];
-      alert('나의 특약에 저장되었습니다! 북마크 페이지에서 확인하세요.');
+    if (step === 'loading') {
+      const timer = setTimeout(() => {
+        if (progress < 3) {
+          setProgress(prev => prev + 1);
+        } else {
+          if (loopCount < 2) { 
+            setProgress(0);
+            setLoopCount(prev => prev + 1);
+          } else {
+            setStep('finish');
+          }
+        }
+      }, 1000); 
+      return () => clearTimeout(timer);
     }
+  }, [step, progress, loopCount]);
 
-    localStorage.setItem('bookmarked_terms', JSON.stringify(newList));
-    setBookmarkedIds(prev => ({ ...prev, [title] : !prev[title] }));
+  const handleFileChange = (key, e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.type !== "application/pdf") {
+        alert("PDF 형식의 파일만 업로드 가능합니다. 다시 선택해주세요.");
+        e.target.value = ""; 
+        return;
+      }
+      setUploadedFiles(prev => ({ ...prev, [key]: file.name }));
+    }
   };
 
+  const startAnalysis = () => {
+    setIsModalOpen(false);
+    setStep('loading');
+    setProgress(0);
+    setLoopCount(0);
+  };
+
+  const loadingData = [
+    { title: "서류 파싱 완료", desc: "텍스트·날인 인식 완료" },
+    { title: "소유권·채무관계 분석", desc: "갑구·을구 검토 중..." },
+    { title: "건물·세금 상태 확인", desc: "건축물대장·세금 체납" },
+    { title: "위험도 리포트 생성", desc: "신호등 점수 도출" },
+  ];
+
   return (
-    <>
-      <style>{`
-        *{ box-sizing:border-box; }
-        body{ margin:0; font-family: Arial, sans-serif; background:#eef1f7; }
-        .container{ width:100%; max-width:430px; margin:0 auto; background:#eef1f7; min-height:100vh; padding-bottom:24px; }
-        .topSection{ background:linear-gradient(180deg,#3f4d8e 0%, #3f4d8e 100%); padding:50px 20px 25px; color:white; border-bottom-left-radius:30px; border-bottom-right-radius:30px; }
-        .header{ display:flex; align-items:center; gap:12px; margin-bottom:20px; }
-        .backBtn{ width:32px; height:32px; border:none; border-radius:10px; background:rgba(255,255,255,0.16); color:white; font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
-        .header h2{ margin:0; font-size:20px; font-weight:800; }
-        .addressCard{ width:100%; background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.2); backdrop-filter:blur(10px); border-radius:18px; padding:18px; }
-        .addrTag{ margin:0 0 8px 0; font-size:11px; color:rgba(255,255,255,0.7); font-weight:600; }
-        .addressCard h3{ margin:0 0 12px 0; font-size:16px; font-weight:800; color:white; }
-        .warnRow{ display:flex; align-items:center; gap:8px; }
-        .warnDot{ width:6px; height:6px; border-radius:50%; background:#ffbf1a; }
-        .warnText{ margin:0; color:#ffd35e; font-size:12px; font-weight:600; }
-        .section{ background:white; padding:24px 20px; border-radius:30px; margin: -15px 10px 0; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
-        .sectionHeader{ display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; }
-        .sectionHeader h3{ margin:0; font-size:16px; color:#24244d; font-weight:800; }
-        .pdfBtn{ border:none; background:transparent; color:#7167ff; font-size:12px; font-weight:700; cursor:pointer; }
-        .specialCard{ background:#f8faff; border:1.5px solid #eef0ff; border-radius:20px; padding:18px; margin-bottom:15px; position: relative; }
-        .cardTop{ display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; padding-right: 30px; }
-        .cardTitleWrap{ display:flex; align-items:center; gap:10px; }
-        .smallNumber{ width:28px; height:28px; border-radius:8px; background:#eef0ff; color:#3f4d8e; font-size:15px; font-weight:800; display:flex; align-items:center; justify-content:center; }
-        .cardTitleWrap h4{ margin:0; font-size:14px; color:#24244d; font-weight:800; }
-        .badge{ padding:6px 10px; border-radius:8px; font-size:11px; font-weight:800; }
-        .warning{ background:#ffe4a1; color:#db8b00; }
-        .success{ background:#d7f2da; color:#33a856; }
-        .quoteBox{ background:white; border-radius:12px; padding:15px; margin-bottom:10px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); }
-        .quoteBox.purple{ border-left:4px solid #3f4d8e; }
-        .quoteBox.green{ border-left:4px solid #1ec25a; }
-        .quoteBox p{ margin:0; font-size:13px; line-height:1.6; color:#475569; font-weight:500; }
-        .lawText{ margin:0; font-size:11px; color:#3f4d8e; text-decoration:underline; }
-        .saveBtn{ width:calc(100% - 40px); margin:20px auto; display:block; border:none; border-radius:18px; background:#3f4d8e; color:white; font-size:16px; font-weight:800; padding:18px; cursor:pointer; box-shadow: 0 4px 15px rgba(81, 70, 239, 0.3); }
-
-        .bookmarkBtn {
-          position: absolute; right: 15px; top: 18px;
-          background: none; border: none; cursor: pointer;
-          padding: 5px; transition: transform 0.2s;
-        }
-        .bookmarkBtn:active { transform: scale(1.2); }
-      `}</style>
-
-      <div className="container">
-        <div className="topSection">
-          <div className="header">
-            <button className="backBtn" onClick={() => navigate(-1)}>←</button>
-            <h2>AI 특약 자동 생성</h2>
-          </div>
-          <div className="addressCard">
-            <p className="addrTag">분석된 주소지 정보</p>
-            <h3>서울시 마포구 합정동 123-4</h3>
-            <div className="warnRow">
-              <span className="warnDot"></span>
-              <p className="warnText">주의 항목 2개 발견 — 맞춤 특약 생성</p>
+    <div style={{ backgroundColor: '#F8FAFC', minHeight: '100vh', position: 'relative' }}>
+      {step === 'upload' ? (
+        <div style={{ paddingBottom: '40px' }}>
+          <div style={{ background: MAIN_COLOR, padding: '40px 20px 60px 20px', color: 'white', textAlign: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
+              <div onClick={() => navigate('/')} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+                <Icons.Back />
+              </div>
+              <h2 style={{ flex: 1, fontSize: '18px', margin: 0, fontWeight: 'bold', color : '#EEF2FF', marginRight: '24px' }}>
+                서류 업로드
+              </h2>
             </div>
+            <p style={{ fontSize: '13px', opacity: 0.9, lineHeight: '1.5', margin: 0 }}>
+              등기부등본은 필수예요.<br/>추가할수록 분석이 더 정확해져요.
+            </p>
+          </div>
+
+          <div style={{ background: 'white', marginTop: '-30px', borderRadius: '30px 30px 0 0', padding: '30px 20px', minHeight: '500px' }}>
+            {/* 업로드 아이템들 생략 (기존 코드와 동일) */}
+            <input type="file" id="f1" accept=".pdf" style={{display:'none'}} onChange={(e)=>handleFileChange('doc1', e)} />
+            <input type="file" id="f2" accept=".pdf" style={{display:'none'}} onChange={(e)=>handleFileChange('doc2', e)} />
+            <input type="file" id="f3" accept=".pdf" style={{display:'none'}} onChange={(e)=>handleFileChange('doc3', e)} />
+            <input type="file" id="f4" accept=".pdf" style={{display:'none'}} onChange={(e)=>handleFileChange('doc4', e)} />
+            
+            <div onClick={() => document.getElementById('f1').click()}>
+              <UploadItem title="등기부등본" tag="필수" desc={uploadedFiles.doc1 || "인터넷등기소 발급본"} completed={!!uploadedFiles.doc1} />
+            </div>
+            <div onClick={() => document.getElementById('f2').click()}>
+              <UploadItem title="부동산 계약서" tag="선택" desc={uploadedFiles.doc2 || "전세계약서 PDF 파일"} dashed completed={!!uploadedFiles.doc2} />
+            </div>
+            <div onClick={() => document.getElementById('f3').click()}>
+              <UploadItem title="건축물대장" tag="선택" desc={uploadedFiles.doc3 || "정부24 무료 발급 PDF"} dashed completed={!!uploadedFiles.doc3} />
+            </div>
+            <div onClick={() => document.getElementById('f4').click()}>
+              <UploadItem title="세금완납증명서" tag="선택" desc={uploadedFiles.doc4 || "국세·지방세 완납 확인서"} dashed completed={!!uploadedFiles.doc4} />
+            </div>
+
+            <button 
+              onClick={() => setIsModalOpen(true)} // 👈 바로 시작 안 하고 모달 띄움 ㅋ
+              disabled={!uploadedFiles.doc1}
+              style={{ 
+                width: '100%', padding: '18px', borderRadius: '15px', border: 'none',
+                background: uploadedFiles.doc1 ? MAIN_COLOR : '#EEF2FF', 
+                color: uploadedFiles.doc1 ? 'white' : '#94A3B8', 
+                fontWeight: 'bold', fontSize: '16px', marginTop: '40px',
+                cursor: uploadedFiles.doc1 ? 'pointer' : 'not-allowed'
+              }}
+            >
+              분석 시작하기
+            </button>
           </div>
         </div>
-
-        <div className="section">
-          <div className="sectionHeader">
-            <h3>📝 안심 특약 리스트</h3>
-            <button className="pdfBtn">PDF 전체 저장</button>
+      ) : (
+        /* 로딩/완료 화면 생략 (기존 코드와 동일) */
+        <div style={{ padding: '40px 20px', textAlign: 'center' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '60px' }}>
+            <h2 style={{ fontSize: '20px', fontWeight: '900', color: MAIN_COLOR, margin: 0 }}>집어<span style={{color: '#94A3B8'}}>줌</span></h2>
+            <button onClick={() => {setStep('upload'); setProgress(0); setLoopCount(0);}} style={{ border: '1px solid #E2E8F0', background: 'white', padding: '6px 14px', borderRadius: '8px', color: '#94A3B8' }}>취소</button>
           </div>
 
-          {/* 특약 리스트 아이템들 */}
-          {[
-            { id: 1, title: "근저당 말소 조건부 특약", badge: "주의 대응", type: "purple", law: "민법 제357조", desc: "임대인은 잔금 지급일 이전까지 이 건물에 설정된 근저당권 전액을 말소하여야 하며..." },
-            { id: 2, title: "용도 변경 확인 특약", badge: "주의 대응", type: "purple", law: "건축법 시행령", desc: "임대인은 본 임대차 목적물이 주거 목적으로 사용함에 있어 법적 하자가 없음을 보증하며..." },
-            { id: 3, title: "확정일자 취득 협조 특약", badge: "기본 권장", type: "green", law: "주택임대차보호법 제3조의2", desc: "임차인은 입주일 당일 확정일자를 취득하며, 임대인은 이에 필요한 정보 제공에 적극 협조한다." }
-          ].map((item) => (
-            <div className="specialCard" key={item.id}>
-              <button className="bookmarkBtn" onClick={() => toggleBookmark(item.title, item.desc)}>
-                <svg width="22" height="22" viewBox="0 0 24 24" 
-                     fill={bookmarkedIds[item.title] ? "#3f4d8e" : "none"} 
-                     stroke={bookmarkedIds[item.title] ? "#3f4d8e" : "#cbd5e1"} 
-                     strokeWidth="2.5">
-                  <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
-                </svg>
-              </button>
-              <div className="cardTop">
-                <div className="cardTitleWrap">
-                  <div className="smallNumber">{item.id}</div>
-                  <h4>{item.title}</h4>
+          <div className={step === 'loading' ? "pulse-circle" : ""} style={{ width: '80px', height: '80px', borderRadius: '50%', border: step === 'finish' ? "none" : `2px solid ${MAIN_COLOR}`, margin: '0 auto 30px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            {step === 'finish' ? <Icons.CheckCircle /> : <span style={{ fontSize: '30px' }}>🛡️</span>}
+          </div>
+          
+          <h3 style={{ fontSize: '22px', fontWeight: 'bold', color: '#1E293B' }}>
+            {step === 'finish' ? '분석이 완료되었습니다!' : 'AI가 심층 분석 중입니다'}
+          </h3>
+          <p style={{ color: '#94A3B8', marginBottom: '40px', fontSize: '14px' }}>
+            {step === 'finish' ? '결과 확인 버튼을 눌러주세요.' : `서류 대조 및 검증 진행 중 (${loopCount + 1}/3)`}
+          </p>
+
+          <div style={{ textAlign: 'left' }}>
+            {loadingData.map((data, i) => (
+              <div key={i} style={{ 
+                display: 'flex', alignItems: 'center', padding: '20px 16px', borderRadius: '15px', marginBottom: '10px',
+                background: step === 'finish' ? '#F0FDF4' : (i === progress ? '#EEF2FF' : '#F8FAFC'),
+                border: step === 'loading' && i === progress ? `1.5px solid ${MAIN_COLOR}` : '1.5px solid transparent',
+                opacity: step === 'finish' || i === progress ? 1 : 0.4,
+                transition: 'all 0.2s'
+              }}>
+                <div style={{ flex: 1 }}>
+                  <p style={{ margin: 0, fontSize: '15px', fontWeight: 'bold', color: step === 'finish' ? SUCCESS_COLOR : (i === progress ? MAIN_COLOR : '#334155') }}>{data.title}</p>
+                  <p style={{ margin: '4px 0 0', fontSize: '12px', color: '#94A3B8' }}>{data.desc}</p>
                 </div>
-                <div className={`badge ${item.type === 'purple' ? 'warning' : 'success'}`}>{item.badge}</div>
+                <div style={{ 
+                  width: '20px', height: '20px', 
+                  border: step === 'finish' ? `2px solid ${SUCCESS_COLOR}` : (i === progress ? `2px solid ${MAIN_COLOR}` : '2px solid #E2E8F0'), 
+                  borderRadius: '50%', 
+                  background: step === 'finish' ? SUCCESS_COLOR : (i === progress ? MAIN_COLOR : 'transparent') 
+                }} />
               </div>
-              <div className={`quoteBox ${item.type}`}>
-                <p>"{item.desc}"</p>
-              </div>
-              <p className="lawText">📜 {item.law} 관련</p>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
 
-        <button className="saveBtn" onClick={() => alert('PDF 저장 기능 준비 중입니다.')}>
-          📄 전체 특약 리포트 PDF 저장
-        </button>
-      </div>
-    </>
+          {step === 'finish' && (
+            <button 
+              onClick={() => navigate('/caution-report')} 
+              style={{ 
+                width: '100%', padding: '18px', borderRadius: '15px', border: 'none',
+                background: SUCCESS_COLOR, color: 'white', fontWeight: 'bold', fontSize: '16px', 
+                marginTop: '30px', boxShadow: `0 4px 15px rgba(34, 197, 94, 0.3)`,
+                cursor: 'pointer'
+              }}
+            >
+              분석 결과 확인하기 →
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* 👇 법적 고지 안내 모달 ㅋ */}
+      {isModalOpen && (
+        <div style={{ 
+          position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', 
+          backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', 
+          justifyContent: 'center', zIndex: 1000, padding: '20px', boxSizing: 'border-box'
+        }}>
+          <div style={{ 
+            backgroundColor: 'white', borderRadius: '25px', width: '100%', maxWidth: '400px', 
+            padding: '30px 24px', position: 'relative', textAlign: 'center',
+            boxShadow: '0 20px 40px rgba(0,0,0,0.2)', animation: 'slideUp 0.3s ease-out'
+          }}>
+            <button 
+              onClick={() => setIsModalOpen(false)}
+              style={{ position: 'absolute', top: '20px', right: '20px', border: 'none', background: 'none', cursor: 'pointer', color: '#94A3B8' }}
+            >
+              <X size={24} />
+            </button>
+
+            <div style={{ width: '60px', height: '60px', background: '#FEF2F2', borderRadius: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
+              <AlertCircle size={32} color="#EF4444" />
+            </div>
+
+            <h3 style={{ fontSize: '20px', fontWeight: 'bold', color: '#1E293B', marginBottom: '12px' }}>분석 시작 전 유의사항</h3>
+            <div style={{ textAlign: 'left', background: '#F8FAFC', padding: '16px', borderRadius: '15px', fontSize: '13px', color: '#64748B', lineHeight: '1.6', marginBottom: '20px' }}>
+              • 본 분석 결과는 AI가 입력된 서류를 바탕으로 제공하는 <b>참고용 자료</b>입니다.<br/>
+              • 실제 권리 관계와 다를 수 있으며, 당사는 분석 결과에 대해 <b>법적 책임을 지지 않습니다.</b><br/>
+              • 계약 전 반드시 공인중개사나 전문가와 상담하시기 바랍니다.
+            </div>
+
+            <div 
+              onClick={() => setIsAgreed(!isAgreed)}
+              style={{ 
+                display: 'flex', alignItems: 'center', justifyContent: 'center', 
+                padding: '12px', borderRadius: '12px', cursor: 'pointer',
+                background: isAgreed ? '#F0F9FF' : 'transparent',
+                border: isAgreed ? `1px solid ${MAIN_COLOR}` : '1px solid #E2E8F0',
+                marginBottom: '24px', transition: 'all 0.2s'
+              }}
+            >
+              <div style={{ 
+                width: '20px', height: '20px', borderRadius: '6px', border: `2px solid ${isAgreed ? MAIN_COLOR : '#E2E8F0'}`,
+                background: isAgreed ? MAIN_COLOR : 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: '10px'
+              }}>
+                {isAgreed && <CheckCircle2 size={14} color="white" />}
+              </div>
+              <span style={{ fontSize: '14px', fontWeight: 'bold', color: isAgreed ? MAIN_COLOR : '#94A3B8' }}>위 내용을 모두 확인했습니다.</span>
+            </div>
+
+            <button 
+              onClick={startAnalysis}
+              disabled={!isAgreed}
+              style={{ 
+                width: '100%', padding: '16px', borderRadius: '12px', border: 'none',
+                background: isAgreed ? MAIN_COLOR : '#E2E8F0', 
+                color: 'white', fontWeight: 'bold', fontSize: '16px', cursor: isAgreed ? 'pointer' : 'not-allowed'
+              }}
+            >
+              확인 및 분석 시작
+            </button>
+          </div>
+        </div>
+      )}
+
+      <style>{`
+        .pulse-circle { animation: pulse 2s infinite ease-out; }
+        @keyframes pulse { 0% { transform: scale(0.9); opacity: 1; } 100% { transform: scale(1.3); opacity: 0; } }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+      `}</style>
+    </div>
   );
 }
 
-export default ContractReport;
+// UploadItem 함수는 기존과 동일하게 유지 ㅋ
+function UploadItem({ title, tag, desc, completed, dashed }) {
+  return (
+    <div style={{ 
+      display: 'flex', 
+      alignItems: 'center', 
+      padding: '20px 16px', 
+      borderRadius: '15px', 
+      border: dashed ? '1.5px dashed #E2E8F0' : completed ? '1.5px solid #3f4d8e' : '1.5px solid #E2E8F0',
+      background: 'white', 
+      marginBottom: '12px', 
+      cursor: 'pointer',
+      transition: 'all 0.2s'
+    }}>
+      <div style={{ width: '45px', height: '45px', background: '#F8FAFC', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px', flexShrink: 0 }}>
+        📋
+      </div>
+      <div style={{ marginLeft: '15px', flex: 1, textAlign: 'left' }}>
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '4px' }}>
+          <span style={{ fontSize: '15px', fontWeight: 'bold', color: '#334155' }}>{title}</span>
+          <span style={{ marginLeft: '6px', fontSize: '10px', padding: '2px 6px', borderRadius: '4px', background: tag === '필수' ? '#FEE2E2' : '#F1F5F9', color: tag === '필수' ? '#EF4444' : '#94A3B8' }}>{tag}</span>
+        </div>
+        <p style={{ margin: 0, fontSize: '12px', color: completed ? '#3f4d8e' : '#94A3B8', lineHeight: '1.4' }}>{desc}</p>
+      </div>
+      <div style={{ width: '22px', height: '22px', border: completed ? '6px solid #3f4d8e' : '2px solid #E2E8F0', borderRadius: '50%', transition: 'all 0.2s', flexShrink: 0 }} />
+    </div>
+  );
+}
