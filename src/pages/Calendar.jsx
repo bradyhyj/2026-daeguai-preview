@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Menu, ChevronDown, ChevronLeft, ChevronRight, Check, X, Sparkles, Calendar as CalendarIcon } from 'lucide-react';
+import { Plus, Menu, ChevronLeft, ChevronRight, Check, X, Sparkles, Calendar as CalendarIcon } from 'lucide-react';
 
 export default function Calendar() {
   const navigate = useNavigate();
@@ -104,7 +104,7 @@ export default function Calendar() {
         .selected-date { background: white; color: ${MAIN_COLOR}; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(255, 255, 255, 0.3); }
         .event-dot { position: absolute; bottom: 6px; width: 4px; height: 4px; background: #f87171; border-radius: 50%; }
         
-        /* ✅ 버튼과 카드의 가로 길이를 100%로 통일 ㅋ */
+        /* ✅ 버튼과 카드의 가로 길이를 100%로 통일 */
         .full-width-box { width: 100%; box-sizing: border-box; margin-bottom: 12px; }
         
         .event-card-wide { 
@@ -125,13 +125,32 @@ export default function Calendar() {
       {/* 상단 바 */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Menu size={24} onClick={() => navigate(-1)} style={{ cursor: 'pointer' }} />
-        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}>
-          <span style={{ fontWeight: '800' }}>{viewYear}</span>
-          <ChevronDown size={16} />
-        </div>
+        
+        {/* ✅ HTML 기본 드롭다운(select)으로 연도 변경 기능 추가 */}
+        <select 
+          value={viewYear} 
+          onChange={(e) => setViewYear(Number(e.target.value))}
+          style={{ 
+            background: 'rgba(255,255,255,0.1)', 
+            color: 'white', 
+            border: '1px solid rgba(255,255,255,0.3)', 
+            padding: '6px 10px', 
+            borderRadius: '10px', 
+            fontSize: '16px', 
+            fontWeight: '800', 
+            outline: 'none',
+            cursor: 'pointer'
+          }}
+        >
+          {years.map(y => (
+            <option key={y} value={y} style={{ color: 'black' }}>
+              {y}
+            </option>
+          ))}
+        </select>
       </div>
 
-      {/* ✅ 'Calendar' 글자 하얗게 설정 ㅋ */}
+      {/* ✅ 'Calendar' 글자 하얗게 설정 */}
       <h1 style={{ fontSize: '32px', fontWeight: '900', margin: '25px 0 10px', color: 'white' }}>Calendar</h1>
 
       {/* 📅 달력 카드 */}
@@ -166,7 +185,7 @@ export default function Calendar() {
         </div>
       </div>
 
-      {/* 📋 Upcoming Events (가로 길이 통일 ㅋ) */}
+      {/* 📋 Upcoming Events */}
       <div style={{ marginTop: '40px' }}>
         <h3 style={{ fontSize: '18px', fontWeight: '800', marginBottom: '15px', letterSpacing: '0.5px' }}>Upcoming Events</h3>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -227,7 +246,7 @@ export default function Calendar() {
         </div>
       )}
 
-      {/* ➕ 추가 버튼 (가로 길이 카드와 동일 ㅋ) */}
+      {/* ➕ 추가 버튼 */}
       {!isInputOpen && (
         <button 
           onClick={() => setIsInputOpen(true)}
