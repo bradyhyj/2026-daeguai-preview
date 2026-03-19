@@ -21,12 +21,12 @@ export default function Bookmark() {
   }, []);
 
   const clearAllData = () => {
-    if (window.confirm("시연을 위해 모든 북마크 데이터를 초기화할까요?")) {
+    if (window.confirm("모든 북마크 데이터를 초기화할까요?")) {
       localStorage.clear(); 
       setReports([]);
       setTerms([]);
       setChatReplies([]);
-      alert("모두 비워졌습니다. 이제 깨끗한 상태로 시연을 시작하세요!");
+      alert("모두 삭제되었습니다!");
     }
   };
 
