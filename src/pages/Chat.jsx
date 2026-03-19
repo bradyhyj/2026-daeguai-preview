@@ -93,7 +93,7 @@ function Chat() {
         .banner { width: 100%; border-radius: 12px; border: 1px solid #bfd0f7; background: #eaf1ff; color: #5a61b5; font-size: 12px; padding: 12px; margin-bottom: 24px; display: flex; align-items: center; gap: 8px; }
         .bubbleWrap { display: flex; align-items: flex-end; gap: 8px; margin-bottom: 20px; position: relative; }
         .bubble { border-radius: 18px; padding: 12px 16px; font-size: 14px; line-height: 1.6; max-width: 75%; position: relative; }
-        .bubble.ai { background: white; border: 1px solid #d8ddea; color: #334155; border-top-left-radius: 4px; padding-right: 34px; }
+        .bubble.ai { background: white; border: 1px solid #d8ddea; color: #334155; border-top-left-radius: 4px; padding: 12px 40px 12px 16px; /* 우측 패딩을 40px로 늘려 버튼 공간 확보 */position: relative;}
         .bubble.user { background: #3f4d8e; color: white; border-top-right-radius: 4px; }
         
         .chat-bookmark-btn { 
@@ -117,7 +117,7 @@ function Chat() {
         {messages.map((msg, index) => (
           <div key={index}>
             {msg.type === "banner" ? (
-              <div className="banner">📋 {msg.text}</div>
+              <div className="banner">⭐ {msg.text}</div>
             ) : (
               <div className="bubbleWrap" style={{ justifyContent: msg.type === 'ai' ? 'flex-start' : 'flex-end' }}>
                 <div className={`bubble ${msg.type}`}>
