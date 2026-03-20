@@ -10,6 +10,7 @@ import Chat from './pages/Chat.jsx';
 import MyPage from './pages/MyPage.jsx';
 import Bookmark from './pages/Bookmark.jsx';
 import History from './pages/History.jsx';
+import Map from './pages/Map.jsx';
 
 function App() {
   return (
@@ -18,13 +19,13 @@ function App() {
         <Routes>
           {/* 1. 메인 홈 화면 */}
           <Route path="/" element={<Landing />} />
-          
+
           {/* 2. 서류 업로드 및 분석 진행 화면 */}
           <Route path="/search" element={<Search />} />
 
           {/* 3. 북마크(저장 목록) 화면 */}
           <Route path="/bookmark" element={<Bookmark />} />
-          
+
           {/* 4. 일정 관리 화면 */}
           <Route path="/calendar" element={<Calendar />} />
 
@@ -42,6 +43,9 @@ function App() {
 
           {/* 9. 히스토리 화면 */}
           <Route path="/history" element={<History />} />
+
+          {/* 10. 주소 검색 지도 화면 (하단 돋보기) */}
+          <Route path="/map" element={<Map />} />
         </Routes>
       </Layout>
     </Router>
