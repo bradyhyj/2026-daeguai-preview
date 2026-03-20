@@ -100,7 +100,7 @@ function Chat() {
           position: absolute; right: 8px; top: 8px; background: none; border: none; cursor: pointer; padding: 4px; display: flex; align-items: center; justify-content: center; 
         }
         
-        .bottomInputWrap { position: fixed; left: 0; right: 0; bottom: 120px; background: white; padding: 12px 16px; border-top: 1px solid #eee; z-index: 1000; }
+        .bottomInputWrap { position: fixed; left: 0; right: 0; bottom: 75px; background: white; padding: 12px 16px; border-top: 1px solid #eee; z-index: 1000; }
         .inputRow { display: flex; align-items: center; gap: 10px; }
         .chatInput { flex: 1; height: 44px; border-radius: 22px; border: 1px solid #d5d9e5; background: #f8f9ff; outline: none; padding: 0 18px; font-size: 14px; }
         .sendBtn { width: 40px; height: 40px; border: none; border-radius: 50%; background: #3f4d8e; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; }
